@@ -31,7 +31,7 @@
     v-model="drawer"
     title="设置"
     :direction="btt">
-    查看原排行榜 <el-switch v-model="previous" @change="refresh" />
+    <el-switch v-model="previous" @change="refresh" active-text="原排行榜" inactive-text="现排行榜" />
   </el-drawer>
 </el-main>
 </template>
