@@ -18,7 +18,7 @@
   <el-row>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="rank" label="Rank" />
-      <el-table-column prop="nickname" label="ID" />
+      <el-table-column prop="username" label="ID" />
       <el-table-column prop="score" label="Score" />
     </el-table>
   </el-row>
@@ -49,12 +49,12 @@ export default {
       leaderboard.getResults({
         limit: 50,
         skip: this.$data.page * 50 - 50,
-        selectUserKeys: ['nickname'],
+        selectUserKeys: ['username'],
       }).then(results => {
         this.$data.tableData = results.map(result => {
           return {
             rank: result.rank + 1,
-            nickname: result.user.attributes.nickname,
+            username: result.user.attributes.username,
             score: result.value
           };
         });
@@ -66,12 +66,12 @@ export default {
     const leaderboard = AV.Leaderboard.createWithoutData('score');
     leaderboard.getResults({
       limit: 50,
-      selectUserKeys: ['nickname']
+      selectUserKeys: ['username']
     }).then(results => {
       this.$data.tableData = results.map(result => {
         return {
           rank: result.rank + 1,
-          nickname: result.user.attributes.nickname,
+          username: result.user.attributes.username,
           score: result.value
         };
       });
