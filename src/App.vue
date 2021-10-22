@@ -14,6 +14,7 @@
   <el-space wrap>
       <el-input-number v-model="page" :min="1" @change="refresh" />
       <el-button type="primary" icon="el-icon-refresh" circle @click="refresh" />
+      <el-button icon="el-icon-setting" circle @click="drawer = true;" />
   </el-space>
   <el-row>
     <el-table :data="tableData" style="width: 100%">
@@ -25,6 +26,13 @@
   <el-row>
     <el-input-number v-model="page" :min="0" @change="refresh" />
   </el-row>
+
+  <el-drawer
+    v-model="drawer"
+    title="设置"
+    :direction="btt">
+    查看原排行榜 <el-switch v-model="previous" @change="refresh" />
+  </el-drawer>
 </el-main>
 </template>
 
@@ -38,6 +46,8 @@ export default {
       input: '',
       tableData: [],
       page: 1,
+      previous: false,
+      drawer: false,
     };
   },
   methods: {
@@ -49,12 +59,15 @@ export default {
       leaderboard.getResults({
         limit: 50,
         skip: this.$data.page * 50 - 50,
-        selectUserKeys: ['username'],
+        selectUserKeys: ['username', 'nickname'],
+        version: this.$data.previous ? 4 : 5
       }).then(results => {
         this.$data.tableData = results.map(result => {
           return {
             rank: result.rank + 1,
-            username: result.user.attributes.username,
+            username: this.$data.previous ?
+              result.user.attributes.nickname : 
+              result.user.attributes.username,
             score: result.value
           };
         });
@@ -66,7 +79,7 @@ export default {
     const leaderboard = AV.Leaderboard.createWithoutData('score');
     leaderboard.getResults({
       limit: 50,
-      selectUserKeys: ['username']
+      selectUserKeys: ['username', 'nickname'],
     }).then(results => {
       this.$data.tableData = results.map(result => {
         return {
