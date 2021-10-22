@@ -11,11 +11,20 @@
   <el-divider />
 
   <h2>排行榜</h2>
-  <el-table :data="tableData" style="width: 100%">
-    <el-table-column prop="rank" label="Rank" />
-    <el-table-column prop="nickname" label="ID" />
-    <el-table-column prop="score" label="Score" />
-  </el-table>
+  <el-space wrap>
+      <el-input-number v-model="page" :min="1" @change="refresh" />
+      <el-button type="primary" icon="el-icon-refresh" circle @click="refresh" />
+  </el-space>
+  <el-row>
+    <el-table :data="tableData" style="width: 100%">
+      <el-table-column prop="rank" label="Rank" />
+      <el-table-column prop="nickname" label="ID" />
+      <el-table-column prop="score" label="Score" />
+    </el-table>
+  </el-row>
+  <el-row>
+    <el-input-number v-model="page" :min="0" @change="refresh" />
+  </el-row>
 </el-main>
 </template>
 
@@ -27,16 +36,38 @@ export default {
   data () {
     return {
       input: '',
-      tableData: []
+      tableData: [],
+      page: 1,
     };
+  },
+  methods: {
+    play () {
+      location.href = 'game.html?id=' + this.$data.input;
+    },
+    refresh () {
+      const leaderboard = AV.Leaderboard.createWithoutData('score');
+      leaderboard.getResults({
+        limit: 50,
+        skip: this.$data.page * 50 - 50,
+        selectUserKeys: ['nickname'],
+      }).then(results => {
+        this.$data.tableData = results.map(result => {
+          return {
+            rank: result.rank + 1,
+            nickname: result.user.attributes.nickname,
+            score: result.value
+          };
+        });
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
+      });
+    }
   },
   mounted () {
     const leaderboard = AV.Leaderboard.createWithoutData('score');
     leaderboard.getResults({
-      limit: 100,
+      limit: 50,
       selectUserKeys: ['nickname']
     }).then(results => {
-      console.log(results);
       this.$data.tableData = results.map(result => {
         return {
           rank: result.rank + 1,
@@ -44,14 +75,11 @@ export default {
           score: result.value
         };
       });
-      console.log(this.$data.tableData);
+    });
+    AV.Leaderboard.getLeaderboard('score').then((data) => {
+      console.log(data);
     });
   },
-  methods: {
-    play () {
-      location.href = 'game.html?id=' + this.$data.input;
-    },
-  }
 }
 </script>
 
