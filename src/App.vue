@@ -24,13 +24,13 @@
     </el-table>
   </el-row>
   <el-row>
-    <el-input-number v-model="page" :min="0" @change="refresh" />
+    <el-input-number v-model="page" :min="1" @change="refresh" />
   </el-row>
 
   <el-drawer
     v-model="drawer"
     title="设置"
-    :direction="btt">
+    direction="btt">
     <el-switch v-model="previous" @change="refresh" active-text="原排行榜" inactive-text="现排行榜" />
   </el-drawer>
 </el-main>
