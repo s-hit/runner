@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     play () {
-      location.href = 'game.html?id=' + this.$data.input;
+      location.href = 'games/runner.html?id=' + this.$data.input;
     },
     refresh () {
       const leaderboard = AV.Leaderboard.createWithoutData('score');
@@ -88,9 +88,6 @@ export default {
           score: result.value
         };
       });
-    });
-    AV.Leaderboard.getLeaderboard('score').then((data) => {
-      console.log(data);
     });
   },
 }
