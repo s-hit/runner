@@ -66,7 +66,7 @@ export default {
       location.href = 'runner/index.html?id=' + this.$data.input;
     },
     mel () {
-      location.href = 'melon/index.html?id=' + this.$data.input;
+      location.href = 'melon/index.html?id=' + this.$data.input + "&p=";
     },
     refresh () {
       const leaderboard = AV.Leaderboard.createWithoutData(this.$data.board);
