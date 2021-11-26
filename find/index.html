@@ -14,6 +14,10 @@
             0% { background-position: 0px 0px; }
             100% { background-position: 100% 0px; }
         }
+        body {
+            text-align: center;
+            margin: 0;
+        }
         #banner {
             margin: auto;
             background-image: url('../assets/find/banner_background.png');
@@ -31,6 +35,9 @@
             max-height: 100%;
             transition: opacity .5s;
         }
+        #entry button {
+            font-size: x-large;
+        }
         table {
             z-index: 114514;
             margin: auto;
@@ -46,9 +53,6 @@
             width: 75px;
             height: 75px;
             transition: opacity .5s;
-        }
-        #entry button {
-            font-size: x-large;
         }
     </style>
 </head>
@@ -102,6 +106,7 @@
         function end(success) {
             if (ended) {
                 document.getElementById("entry").style.display = "block";
+                document.getElementById("map").innerHTML = "";
             } else {
                 if (success) {
                     let score = new Date().getTime() - date;
