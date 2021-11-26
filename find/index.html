@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+    <title>寻找儒儒桑</title>
+    <style>
+        @keyframes jumping {
+            0% { transform: scale3d(0.75, 0.75, 0.75); }
+            50% { transform: scale3d(1, 1, 1); }
+            100% { transform: scale3d(0.75, 0.75, 0.75); }
+        }
+        @keyframes flowing {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 100% 0px; }
+        }
+        #banner {
+            margin: auto;
+            background-image: url('../assets/find/banner_background.png');
+            background-size: auto 100%;
+            animation-name: flowing;
+            animation-duration: 8s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            transition: opacity .5s;
+        }
+        #banner-img {
+            animation-name: jumping;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            max-height: 100%;
+            transition: opacity .5s;
+        }
+        table {
+            z-index: 114514;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        tr {
+            display: flex;
+        }
+        td {
+            display: contents;
+        }
+        table img {
+            width: 75px;
+            height: 75px;
+            transition: opacity .5s;
+        }
+        #entry button {
+            font-size: x-large;
+        }
+    </style>
+</head>
+<body>
+    <div id="banner">
+        <center><img id="banner-img" src="../assets/find/banner.png" /></center>
+    </div>
+    <hr />
+    <center id="entry">
+        <button onclick="start(14, 10)">14×10</button>
+        <button onclick="start(14, 14)">14×14</button>
+    </center>
+    <table id="map"></table>
+    <script src="//code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
+    <script>
+        AV.init({
+            appId: 'EK27oracrqWzxLAcfhGIMOST-MdYXbMMI',
+            appKey: 'gWA7jWpfJzUM9dzLjc56bwFC'
+        });
+        let wrongAnswers = 2;
+        let date;
+        let ended = false;
+        function getUrlParam(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null; 
+        }
+        function start(w, h) {
+            date = new Date().getTime();
+            ended = false;
+            let x = Math.floor(Math.random() * w);
+            let y = Math.floor(Math.random() * h);
+            let table = "";
+            for (let i = 0; i < h; i ++) {
+                table += "<tr>";
+                for (let j = 0; j < w; j ++) {
+                    table += "<td>";
+                    if (j == x && i == y) {
+                        table += `<img class="cor" onclick="end(1)" src="../assets/find/correct.png" />`;
+                    } else {
+                        table += `<img class="wro" onclick="end(0)" src="../assets/find/wrong_${1 + Math.floor(Math.random() * wrongAnswers)}.png" />`;
+                    }
+                    table += "</td>";
+                }
+                table += "</tr>";
+            }
+            document.getElementById("map").innerHTML = table;
+            document.getElementById("banner").style.opacity = ".5";
+            document.getElementById("banner").style.width = 75 * w + "px";
+            document.getElementById("banner-img").style.opacity = ".5";
+            document.getElementById("entry").style.display = "none";
+        }
+        function end(success) {
+            if (ended) {
+                document.getElementById("entry").style.display = "block";
+            } else {
+                if (success) {
+                    let score = new Date().getTime() - date;
+                    let message = "";
+                    let id = "";
+                    if (score <= 3000) {
+                        message += `恭喜你用时 ${score}ms，在三秒内找到了小幸！😇\n\n`;
+                    } else {
+                        message += `恭喜你用时 ${score}ms 找到了小幸！🤗\n\n`;
+                    }
+
+                    if (!getUrlParam('id')) id = '章鱼哥';
+                    else id = getUrlParam('id');
+
+                    AV.User.logIn(id, id).then(() => {},
+                    () => {
+                        const user = new AV.User();
+                        user.setUsername(id);
+                        user.setPassword(id);
+                        user.signUp();
+                    });
+
+                    AV.Leaderboard.updateStatistics(AV.User.current(), {
+                        'find' : score,
+                        'find_sum' : Math.min(Math.floor(score / 1000), 60)
+                    }).then(() => {
+                        AV.Leaderboard.createWithoutData('find').getResultsAroundUser(AV.User.current(), {
+                            limit: 5,
+                            selectUserKeys: ['username']
+                        }).then(rankings => {
+                            message += rankings
+                                .map(ranking => `${String(ranking.rank + 1)} - ${ranking.user.attributes.username} (${ranking.value})`)
+                                .join("\n");
+                            alert(message);
+                        });
+                    });
+                } else {
+                    alert(`找错了，小幸润了😭`);
+                }
+                ended = true;
+                document.getElementById("banner").style.opacity = "1";
+                document.getElementById("banner-img").style.opacity = "1";
+                let list = document.getElementsByClassName("wro");
+                for (let i = 0; i < list.length; i ++) {
+                    list[i].style.opacity = ".5";
+                }
+                document.getElementsByClassName("cor")[0].style.animation = "jumping 1s infinite";
+            }
+        }
+    </script>
+</body>
+</html>
