@@ -5,8 +5,18 @@
     <el-input v-model="input" placeholder="昵称（默认为章鱼哥）" />
   </el-row>
   <el-row>
-    <el-button type="primary" @click="run">迪士尼在逃小幸</el-button>
-    <el-button type="primary" @click="mel">合成小幸</el-button>
+    <el-dropdown @command="gogogo">
+      <el-button type="primary">
+        点我冲鸭<i class="el-icon-arrow-down el-icon--right"></i>
+      </el-button>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="runner">迪士尼在逃小幸</el-dropdown-item>
+          <el-dropdown-item command="melon">合成小幸</el-dropdown-item>
+          <el-dropdown-item command="find">寻找儒儒桑</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
   </el-row>
   
   <el-divider />
@@ -29,6 +39,10 @@
               :command="['melon_succ', false]">最高胜利得分榜</el-dropdown-item>
             <el-dropdown-item :command="['melon_fail', false]">最高失败得分榜</el-dropdown-item>
             <el-dropdown-item :command="['melon_sum', false]">累计得分榜</el-dropdown-item>
+            <el-dropdown-item divided disabled>寻找儒儒桑</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-trophy"
+              :command="['find', false]">最快寻找榜</el-dropdown-item>
+            <el-dropdown-item :command="['find_sum', false]">累计用时榜</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -62,11 +76,8 @@ export default {
     };
   },
   methods: {
-    run () {
-      location.href = 'runner/index.html?id=' + this.$data.input;
-    },
-    mel () {
-      location.href = 'melon/index.html?id=' + this.$data.input + "&p=";
+    gogogo (dir) {
+      location.href = dir + '/index.html?id=' + this.$data.input + "&p=";
     },
     refresh () {
       const leaderboard = AV.Leaderboard.createWithoutData(this.$data.board);
